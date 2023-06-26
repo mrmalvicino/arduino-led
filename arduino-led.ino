@@ -1,4 +1,4 @@
-int const TIME = 5;
+int const TIME = 1;
 int const NUM_LEDS = 3;
 int led_io[NUM_LEDS][NUM_LEDS] = {{4,7,10}, {5,8,11}, {6,9,12}};
 
