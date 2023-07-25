@@ -1,43 +1,72 @@
-int const NUM_LEDS = 3; // Cantidad de colores
+int const NUM_R_LEDS = 2; // Cantidad de leds rojos
+int const NUM_G_LEDS = 2; // Cantidad de leds verdes
+int const NUM_B_LEDS = 2; // Cantidad de leds azules
 int const NUM_POTS = 3; // Cantidad de potenciometros
-int led_pin[NUM_LEDS][NUM_LEDS] = {{4,7,10}, {5,8,11}, {6,9,12}}; // Pines de leds {{R1, R2, R3}, {G1, G2, G3}, {B1, B2, b3}}
-int pot_pin[NUM_POTS] = {0,1,2}; // Pines de potenciometros {R, G, B}
-int max_level[NUM_LEDS]; // Vector con la intensidad de cada color, por ejemplo {255, 255, 255}
-int switch_pin = 22; // Pin de switch
-int time = 10;
+int const NUM_MENU_PROGRAMS = 2; // Cantidad de programas seleccionables por encoder rotativo
+int red_pin[NUM_R_LEDS] = {4,7};
+int green_pin[NUM_G_LEDS] = {5,8};
+int blue_pin[NUM_B_LEDS] = {6,9};
+int pot_pin[NUM_POTS] = {0,1,2}; // Pines de potenciometros R G B
+int fade_time = 10;
+int encoder_menu;
+
+void read_pots(){
+    for(int i = 0; i < NUM_R_LEDS; i ++){
+        analogWrite(red_pin[i], analogRead(pot_pin[i]) / 4);
+    }
+}
+
+void blink_white(){
+    for(int lvl = 0; lvl < 256; lvl ++){ // Sube intensidad
+        for(int i = 0; i < NUM_R_LEDS; i ++){
+            analogWrite(red_pin[i], lvl);
+        }
+        for(int i = 0; i < NUM_G_LEDS; i ++){
+            analogWrite(green_pin[i], lvl);
+        }
+        for(int i = 0; i < NUM_B_LEDS; i ++){
+            analogWrite(blue_pin[i], lvl);
+        }
+        delay(fade_time);
+    }
+
+    for(int lvl = 255; 0 <= lvl; lvl --){ // Baja intensidad
+        for(int i = 0; i < NUM_R_LEDS; i ++){
+            analogWrite(red_pin[i], lvl);
+        }
+        for(int i = 0; i < NUM_G_LEDS; i ++){
+            analogWrite(green_pin[i], lvl);
+        }
+        for(int i = 0; i < NUM_B_LEDS; i ++){
+            analogWrite(blue_pin[i], lvl);
+        }
+        delay(fade_time);
+    }
+}
 
 void setup(){
-    pinMode(switch_pin, INPUT);
-    
-    for(int i = 0; i < NUM_LEDS; i++){
-        for(int j = 0; j < NUM_LEDS; j++){
-            pinMode(led_pin[i][j], OUTPUT);
-        }
+    for(int i = 0; i < NUM_R_LEDS; i++){
+        pinMode(red_pin[i], OUTPUT);
+    }
+
+    for(int i = 0; i < NUM_G_LEDS; i++){
+        pinMode(green_pin[i], OUTPUT);
+    }
+
+    for(int i = 0; i < NUM_B_LEDS; i++){
+        pinMode(blue_pin[i], OUTPUT);
     }
 }
 
 void loop(){
-    for(int i = 0; i < NUM_LEDS; i ++){
-        max_level[i] = analogRead(pot_pin[i]) / 4;
-    }
+    encoder_menu = 1;
 
-    if(digitalRead(switch_pin) == HIGH){ // Prender y apagar leds progresivamente
-        for(int lvl = 0; lvl < 256; lvl ++){
-            for(int i = 0; i < NUM_LEDS; i ++){
-                analogWrite(led_pin[i][0], lvl);
-            }
-            delay(time);
-        }
-
-        for(int lvl = 255; 0 <= lvl; lvl --){
-            for(int i = 0; i < NUM_LEDS; i ++){
-                analogWrite(led_pin[i][0], lvl);
-            }
-            delay(time);
-        }
-    } else{ // Mantener prendido en los valores leidos por los potenciometros
-        for(int i = 0; i < NUM_LEDS; i ++){
-                analogWrite(led_pin[i][0], max_level[i]);
-            }
+    switch(encoder_menu){
+        case 1:
+            blink_white();
+            break;
+        case 2:
+            read_pots();
+            break;
     }
 }
